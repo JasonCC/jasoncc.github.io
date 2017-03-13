@@ -1,6 +1,11 @@
-## Another Page
+## Linux Programming Interface
 
-[Another Page](_posts/clang/clang-implicit-function-declaration-is-harmful.md)
+[How Many Forks](lpi/how_many_forks.md)
+
+## C Lang
+
+[Another Page](clang/clang-implicit-function-declaration-is-harmful.md)
+
 
 ## Welcome to GitHub Pages
 
