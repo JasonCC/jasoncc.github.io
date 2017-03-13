@@ -40,7 +40,7 @@ This paragraph is missing in the 1999 standard. I've not (yet) tracked the chang
 
 Note that if a function is static, it may be defined before it is used, and need not be preceded by a declaration. GCC can be persuaded to witter if a non-static function is defined without a declaration preceding it (-Wmissing-prototypes).
 
-## GCC Warning Option: `-Wall` and `-Wimplicit-function-declaration`
+## GCC Warning Options: `-Wall` and `-Wimplicit-function-declaration`
 
 The option `-Wno-implicit-function-declaration` is harmful and implicit function desclaration 
 should be considered as an error. But C is an ancient language, so it's only a warning. 
@@ -49,10 +49,10 @@ Compiling with `-Werror` fixes this problem.
 The option `-Wimplicit-function-declaration` is enabled by `-Wall`.
 It can catch potential bugs which results from "Implicit function declaration" such as following demo.
 
-## Demo Code
+## Demo Codes
 
 ```
-@file: utils.c
+// @file: utils.c
 // gcc -shared -fPIC -o libutil.so
 char util_one(int input)
 {
@@ -61,7 +61,7 @@ char util_one(int input)
 ```
 
 ```
-@file: sys.c
+// @file: sys.c
 // gcc -shared -fPIC -o libsys.so
 // without the declaration of function `util_one()`
 char sys_one(int input)
@@ -87,4 +87,7 @@ Well, the compiler behavior on implicit function declaration has changed a bit.
 In this case, the return value `uint8_t` or `BOOLEAN` will be extened to `unsigned int` just before the return.
 
 
+
 [back](../)
+
+
