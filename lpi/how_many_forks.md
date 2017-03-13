@@ -1,4 +1,8 @@
-How Many Forks Will Be Invoked in The following Code?
+---
+layout: default
+---
+
+## How Many Forks Will Be Invoked in The following Code?
 
 ```
 #include <stdlib.h>
@@ -27,3 +31,4 @@ int main(void) {
 
 It only fork once, which is called by `system(3)`.
 
+[back](../)
