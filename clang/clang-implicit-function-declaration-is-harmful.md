@@ -76,8 +76,10 @@ The bug will be looks like:
 
 ```
 callq <util_one>
-test %eax, %eax  # <== It should be "test %al, %al", but it is due to the implicit function declaration.>
+test %eax, %eax
 ```
+
+It should be `test %al, %al`, but it's not due to the implicit function declaration.
 
 ## If a function is defined as `uint8_t f()`, why it runs well under the older GCC, such as gcc-4.1.2, gcc-3.4.4?
 
