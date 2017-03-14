@@ -1,4 +1,4 @@
-## Kernel
+## Linux Kernel
 
 [Kernel Mode Process Stacks on x86-64 bit](kernel/kernel-mode-process-stack.md)
 
