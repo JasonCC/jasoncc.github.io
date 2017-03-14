@@ -7,7 +7,7 @@ layout: default
 ## Linux-4.4 ~ 4.10
 
 `THREAD_SIZE_ORDER` is used to control kernel mode process stack. Its value
-is 2 by default. And it means that the kernel stack 4 page frames (16KB).
+is 2 by default. And it means that the kernel stack is 4 page frames (16KB).
 
 From [`kernel/fork.c`](http://lxr.free-electrons.com/source/kernel/fork.c#L172)
 
