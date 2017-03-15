@@ -53,6 +53,7 @@ int main() {
 - [Function multi-versioning in GCC 6](https://lwn.net/Articles/691932/)
 - [Function Multiversioning](https://gcc.gnu.org/wiki/FunctionMultiVersioning)
 - [CPUID usage for interaction between Hypervisors and Linux](https://lwn.net/Articles/301888/)
+- [GCC's cpuid.h](https://github.com/gcc-mirror/gcc/blob/master/gcc/config/i386/cpuid.h)
 
 
 
