@@ -103,6 +103,7 @@ stack, it will no trace the stack usage there.
 
 - [Debugging the kernel using Ftrace - part 2](https://lwn.net/Articles/366796/)
 - [Embedded Linux Wiki: ftrace](http://elinux.org/Ftrace)
+- [PATCH ftrace: print stack usage right before oops](https://lists.gt.net/linux/kernel/1933198)
 
 [back](../)
 
