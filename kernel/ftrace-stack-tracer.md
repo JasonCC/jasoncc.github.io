@@ -1,5 +1,5 @@
 ---
-layout = default
+layout: default
 ---
 
 # Ftrace: Kernel Stack Tracing
