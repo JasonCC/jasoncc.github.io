@@ -1,5 +1,6 @@
 # Linux Kernel
 
+- [How to Be a Kernel Developer](kernel/how-to-be-a-kernel-developer.md)
 - [A Silly FPU Issue](https://lkml.org/lkml/2017/3/21/896)
 - [Kernel Stack Tracing](kernel/ftrace-stack-tracer.md)
 - [Kernel Mode Process Stacks on x86-64 bit](kernel/kernel-mode-process-stack.md)
