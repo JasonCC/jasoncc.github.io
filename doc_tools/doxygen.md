@@ -69,7 +69,9 @@ $ firefox index.html
 # References
 
 -[How to generate documentation from source code in Linux](http://xmodulo.com/how-to-generate-documentation-from-source-code-in-linux.html)
+
 -[How to browse and search API documentation offline on Linux](http://xmodulo.com/browse-search-api-documentation-offline-linux.html)
+
 -[Doxygen Manual](http://www.stack.nl/~dimitri/doxygen/manual/index.html)
 
 
