@@ -17,6 +17,9 @@
 
 - [Why Implicit Function Declaration Is Harmful](clang/clang-implicit-function-declaration-is-harmful.md)
 
+# Documentation Tools
+
+- [How to Generate Documentation from Source Code in Linux](doc_tools/doxygen.md)
 
 ## About
 
