@@ -2,7 +2,7 @@
 layout: default
 ---
 
-## Kernel Hardening and Security Feature Matrix
+## Kernel Hardening and Security Features Matrix
 
 - [Ubuntu Kernel Hardening](https://wiki.ubuntu.com/SecurityTeam/Roadmap/KernelHardening)
 - [Fedora Security Features Matrix](https://fedoraproject.org/wiki/Security_Features_Matrix)
