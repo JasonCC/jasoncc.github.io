@@ -7,7 +7,7 @@
 
 # Security
 
-- [Kernel Hardening and Features Matrix](security/kernel-hardening-and-feature-matrix.md)
+- [Kernel Hardening and Features Matrix](security/kernel-hardening-and-features-matrix.md)
 
 # GNU GCC and Glibc
 
