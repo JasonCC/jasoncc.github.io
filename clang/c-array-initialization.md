@@ -1,5 +1,5 @@
 ---
-layout default
+layout: default
 ---
 
 # Array Initialization
@@ -107,6 +107,8 @@ P.S.: Note that memset will not be optimized when the optimization level is `O0`
 ```
 
 Also, note that in C++ (but not C), you can use an empty initializer list, causing the compiler to aggregate-initialize all of the elements of the array.
+
+## References
 
 - [how does array[100] = {0} set the entire array to 0?](http://stackoverflow.com/questions/629017/how-does-array100-0-set-the-entire-array-to-0)
 - [C Standard](http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1124.pdf)
