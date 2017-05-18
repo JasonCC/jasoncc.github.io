@@ -20,6 +20,7 @@
 # C Lang
 
 - [Why Implicit Function Declaration Is Harmful](clang/clang-implicit-function-declaration-is-harmful.md)
+- [Array Initialization](clang/c-array-initialization.md)
 
 # Documentation Tools
 
