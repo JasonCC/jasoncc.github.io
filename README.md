@@ -1,5 +1,6 @@
 # Linux Kernel
 
+- [Examining Load Average](kernel/examining-load-average.md)
 - [A Silly FPU Issue](kernel/fpu-handling-and-a-silly-fpu-issue.md)
 - [How to Be a Kernel Developer](kernel/how-to-be-a-kernel-developer.md)
 - [Kernel Stack Tracing](kernel/ftrace-stack-tracer.md)
