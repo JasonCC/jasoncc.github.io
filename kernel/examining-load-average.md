@@ -258,8 +258,8 @@ give you a feel for the actual relationship and how the decaying filter applies.
 ## References
 
 - [Understanding Linux CPU Load - when should you be worried?](http://blog.scoutapp.com/articles/2009/07/31/understanding-load-averages)
-- [Examining Load Average | Linux Journal](http://www.linuxjournal.com/article/9001)
-- [Load Computing | Wikipedia](https://en.wikipedia.org/wiki/Load_%28computing%29)
+- [Examining Load Average - Linux Journal](http://www.linuxjournal.com/article/9001)
+- [Load Computing - Wikipedia](https://en.wikipedia.org/wiki/Load_%28computing%29)
 - [UNIX Load Average Part 1](http://www.teamquest.com/pdfs/whitepaper/ldavg1.pdf)
 
 [back](../)
