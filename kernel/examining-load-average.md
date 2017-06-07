@@ -2,9 +2,10 @@
 layout: default
 ---
 
-# Examing Load Average
+# Examining Load Average
 
 Dec 01, 2006  By Ray Walker In SysAdmin
+
 *Understanding work-load averages as opposed to CPU usage*
 
 Many Linux administrators and support technicians regularly use the top utility
@@ -12,7 +13,7 @@ for real-time monitoring of their system state. In some shops, it is very
 typical to check top first when there is any sign of trouble. In that case,
 top becomes the de facto critical measurement of the machine's health. If top
 looks good, there must not be any system problems. `top` is rich with information
--- memory usage, kernel states, process priorities, process owner and so forth
+--memory usage, kernel states, process priorities, process owner and so forth
 all can be obtained from top. But, what is the purpose of those three curious
 load averages, and what exactly are they trying to tell me? To answer those
 questions, an intuitive as well as a detailed understanding of how the values
@@ -245,12 +246,9 @@ give you a feel for the actual relationship and how the decaying filter applies.
 
 - The Intuitive Interpretation
     - Freeway traffic patterns are a perfect analogy for this topic.
-
 - CPU contention is a "queuing theory" problem, and the concepts of arrival rates,
   "poisson theory" and service rates all apply.
-
 - Moving average/Rolling average/Running average.
-
 - Finite impulse response filter (FIR filter). Simple, Cummulative, Weighted.
 
 ## Tools
