@@ -5,10 +5,18 @@
 - [How to Be a Kernel Developer](kernel/how-to-be-a-kernel-developer.md)
 - [Kernel Stack Tracing](kernel/ftrace-stack-tracer.md)
 - [Kernel Mode Process Stacks on x86-64 bit](kernel/kernel-mode-process-stack.md)
+- [LWN Kernel index](https://lwn.net/Kernel/Index/)
+- [Online Kernel Docs and Standards](https://www.kernel.org/doc/)
 
 # Security
 
+- [SecurityFocus](http://www.securityfocus.com/)
 - [Kernel Hardening and Features Matrix](security/kernel-hardening-and-features-matrix.md)
+- [PHRACK](http://phrack.org/index.html)
+
+# OS Dev
+
+- [ELF](osdev/elf.md)
 
 # GNU GCC and Glibc
 
