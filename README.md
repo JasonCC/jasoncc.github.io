@@ -35,6 +35,10 @@
 
 - [How to Generate Documentation from Source Code in Linux](doc_tools/doxygen.md)
 
+# Funny
+
+- [Encryption](https://www.reddit.com/r/funny/comments/6lepfq/encryption/?ref=share&ref_source=link)
+
 ## About
 
 - [About Me](about/about_me.md)
