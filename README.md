@@ -21,6 +21,7 @@
 
 # GNU GCC and Glibc
 
+- [Debugging cc1](gnu_gcc_glibc/debugging-cc1.md)
 - [CPUID](gnu_gcc_glibc/cpuid.md)
 
 # Linux Programming Interface
