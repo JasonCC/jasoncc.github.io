@@ -1,5 +1,6 @@
 # Linux Kernel
 
+- [Syscalls](kernel/syscall.md)
 - [Kernel and Modules Build](kernel/kernel-and-modules-build.md)
 - [Examining Load Average](kernel/examining-load-average.md)
 - [A Silly FPU Issue](kernel/fpu-handling-and-a-silly-fpu-issue.md)
