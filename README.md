@@ -1,5 +1,6 @@
 # Linux Kernel
 
+- [Notes on x86_64 Linux Memory Management Part 1](kernel/jasonc-mm-x86.md)
 - [Syscalls](kernel/syscall.md)
 - [Kernel and Modules Build](kernel/kernel-and-modules-build.md)
 - [Examining Load Average](kernel/examining-load-average.md)
