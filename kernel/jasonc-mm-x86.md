@@ -1,7 +1,3 @@
----
-layout : default
----
-
 # Notes on x86_64 Linux Memory Management Part 1: Memory Addressing
 
 ## x86 System Architecture Operating Modes and Features
@@ -456,7 +452,7 @@ but we support up to 46 bits. This expands into MBZ space in the page tables.
 -Andi Kleen, Jul 2004
 ```
 
-#### An little interesting `page_address()` implemenation on x86_64
+#### A little interesting `page_address()` implemenation on x86_64
 
 A linear address can be calculated by `__va(PFN_PHYS(page_to_pfn(page)))`, 
 which is equivalent to: `(page - vmemmap) / 64 * 4096`. Where
@@ -647,33 +643,35 @@ see `mm_cpumask`, `cpumask_set_cpu`, `swtich_mm`.
 
 ##### Common in 3.2 and 4.4
 
-`arch/x86/include/asm/page_types.h` common macros of x86 page table.
-`arch/x86/include/asm/pgtable_64_types.h` macros of x86_64 4-level paging 
-`arch/x86/include/asm/pgtable.h` page table handling.
-`arch/x86/include/asm/pgtable_types.h` page table handling.
-`arch/x86/mm/pgtable.c` Page allocation functions.
-`arch/x86/kernel/setup.c` Architecture-specific boot-time initializations.
-`arch/x86/kernel/e820.c` BIOS-provided memory map.
+| file                                | Desc |
+| ----------------------------------- | ----------- |
+| `arch/x86/include/asm/page_types.h`    | common macros of x86 page table |
+| `arch/x86/include/asm/pgtable_64_types.h`| macros of x86_64 4-level paging |
+| `arch/x86/include/asm/pgtable.h` | page table handling |
+| `arch/x86/include/asm/pgtable_types.h` | page table handling |
+| `arch/x86/mm/pgtable.c` | Page allocation functions |
+| `arch/x86/kernel/setup.c` | Architecture-specific boot-time initializations |
+| `arch/x86/kernel/e820.c` | BIOS-provided memory map |
 
 ##### Linux 3.2
 
-`arch/x86/include/asm/segment.h` segment layout and definitions.
-`arch/x86/kernel/head_64.S`      start in 32bit and switch to 64bit. 
-`arch/x86/kernel/init_task.c`    initial task and per-CPU TSS segments.
-`arch/x86/kernel/process_64.c`   process handling.
-`arch/x86/include/asm/processor.h` x86 `tss_struct` and per-CPU `init_tss`.
+| file                                | Desc |
+| ----------------------------------- | ----------- |
+| `arch/x86/include/asm/segment.h` | segment layout and definitions |
+| `arch/x86/kernel/head_64.S`      | start in 32bit and switch to 64bit. |
+| `arch/x86/kernel/init_task.c`    | initial task and per-CPU TSS segments |
+| `arch/x86/kernel/process_64.c`   | process handling |
+| `arch/x86/include/asm/processor.h` | x86 `tss_struct` and per-CPU `init_tss`|
 
 ##### Linux 4.4
 
-`arch/x86/kernel/process.c`      per-CPU TSS segments.
+| file                        | Desc |
+| --------------------------- | ----------- |
+| `arch/x86/kernel/process.c` | per-CPU TSS segments. |
 
 ## References
 
 - [What every programmer should know about memory, Part 1](https://lwn.net/Articles/250967/)
 - [Memory part 2: CPU caches](https://lwn.net/Articles/252125/)
 - [Memory part 3: Virtual Memory](https://lwn.net/Articles/253361/)
-
-
-[back](../)
-
 
