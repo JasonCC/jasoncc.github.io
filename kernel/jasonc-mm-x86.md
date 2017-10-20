@@ -267,17 +267,17 @@ Fields in 64bit linear address space:
 
 The entries of Page Directories and Page Tables have the same structure. Each entry includes the following fields:
 
-- *Present flag*
-- *Field containing the 20 most significant bits of a page frame physical address*
-- *Accessed flag*: set each time the paging unit addresses the corresponding page frame. (e.g. PFRA)
-- *Dirty flag*
-- *Read/Write flag*: contains the access right (Read/Write or Read) of page or of the page table.
-- *User/Supervisor flag*: contains privilege level required to access the page or of the page table.
-- *PCD and PWT flag*: contains the way the page or Page Table is handled by the hardware cache.
-    - PCD: page-level cache disable
-    - PWT: page-level write-through
-- *Page Size flag*: applies only to Page Directory entries. If it's set, the entry refers to a 2MB, or 4MB long page frame.
-- *Global flag*: applies only to Page Table entries. This flag as introduced to prevent frequently used pages from being flushed from *TLB cache*. It works only if the Page Global Enable (PGE) flag of register *CR4* is set.
+- **Present flag**
+- **Field containing the 20 most significant bits of a page frame physical address**
+- **Accessed flag**: set each time the paging unit addresses the corresponding page frame. (e.g. PFRA)
+- **Dirty flag**
+- **Read/Write flag**: contains the access right (Read/Write or Read) of page or of the page table.
+- **User/Supervisor flag**: contains privilege level required to access the page or of the page table.
+- **PCD and PWT flag**: contains the way the page or Page Table is handled by the hardware cache.
+    - *PCD*: page-level cache disable
+    - *PWT*: page-level write-through
+- **Page Size flag**: applies only to Page Directory entries. If it's set, the entry refers to a 2MB, or 4MB long page frame.
+- **Global flag**: applies only to Page Table entries. This flag as introduced to prevent frequently used pages from being flushed from *TLB cache*. It works only if the Page Global Enable (PGE) flag of register *CR4* is set.
 
 
 #### Extended/PAE Paging (Large Pages)
@@ -362,33 +362,41 @@ Five type-conversion macros cast an unsigned integer into the required type:
 Kernel also provides several macros and functions to read or modify page tables
 entries.
 
-- `(pte|pmd|pud|pgd)_none`
-- `(pte|pmd|pud|pgd)_clear`, `ptep_get_and_clear()`
-- `set_(pte|pmd|pud|pgd)`
-- `pte_same(a,b)`
-- `pmd_large(e)` return 1 if the Page Middle Directoy entry e refers to a large page (2MB or 4MB), 0 otherwise.
-- `pmd_bad` yields 1 if the entry points to a bad Page Table, that is at least
-one of the following conditions applies: (see `_KERNPG_TABLE`)
-    - The page is not in main memory (*Present* flag cleared).
-    - The page allows only Read access (*Read/Write* flags cleared).
-    - Either *Accessed* or *Dirty* is cleared (Linu always forces these flags to be set for every Page Table).
-- `(pud|pgd)_bad`
-- `(pte|pmd|pud|pgd)_present`
+```c
+- (pte|pmd|pud|pgd)_none
+- (pte|pmd|pud|pgd)_clear, ptep_get_and_clear()
+- set_(pte|pmd|pud|pgd)
+- pte_same(a,b)
+- pmd_large(e) return 1 if the Page Middle Directoy entry e refers to a large 
+  page (2MB or 4MB), 0 otherwise.
+- pmd_bad yields 1 if the entry points to a bad Page Table, that is at least
+  one of the following conditions applies: (see `_KERNPG_TABLE`)
+        - The page is not in main memory (*Present* flag cleared).
+        - The page allows only Read access (*Read/Write* flags cleared).
+        - Either *Accessed* or *Dirty* is cleared (Linu always forces these
+          flags to be set for every Page Table).
+- (pud|pgd)_bad
+- (pte|pmd|pud|pgd)_present
+```
 
-Page flag reading functions: `pte_(user|read|write|exec|dirty|young|file)`
+**Page flag reading functions**:
 
-Page flag setting functions:
+`pte_(user|read|write|exec|dirty|young|file)`
 
-- `pte_(mkhuge|clrhuge|wrprotect|rdprotect|mkread|mkwrite|mkexec|mkdirty|...)`
+**Page flag setting functions**:
 
-Page allocation functions:
+`pte_(mkhuge|clrhuge|wrprotect|rdprotect|mkread|mkwrite|mkexec|mkdirty|...)`
 
-- `pgd_alloc(mm)`, `pgd_free(pgd)`
-- `pud_alloc(mm, pgd, addr)`, `pud_free(x)`
-- `pmd_alloc(mm, pud, addr)`, `pmd_free(x)`
-- `pte_alloc_map|kernel(mm, pmd, addr)`, `pte_free(pte)`
-- `pte_free(pte)`, `pte_free_kernel(pte)`
-- `clear_page_range(mmu, start, end)`
+**Page allocation functions**:
+
+```c
+- pgd_alloc(mm), pgd_free(pgd)
+- pud_alloc(mm, pgd, addr), pud_free(x)
+- pmd_alloc(mm, pud, addr), pmd_free(x)
+- pte_alloc_map|kernel(mm, pmd, addr), pte_free(pte)
+- pte_free(pte), pte_free_kernel(pte)
+- clear_page_range(mmu, start, end)
+```
 
 The `index` field of the page descriptor used as a pgd page is pointing to the
 corresponding memory descriptor `mm_struct`. (see `pgd_set_mm`)
@@ -397,7 +405,7 @@ Global variable `pgd_list` holds the doubly linked list of pgd(s) by linking `pa
 
 Common kernel code path: `execve()`
 
-```c
+```
 do_execve_common @fs/exec.c
     bprm_mm_init
         mm_alloc @kernel/fork.c
@@ -425,7 +433,7 @@ description of the memory map.
 
 The following is grabbed from v3.2.
 
-```c
+```
 <previous description obsolete, deleted>
 
 Virtual memory map with 4 level page tables:
@@ -462,9 +470,9 @@ A linear address can be calculated by `__va(PFN_PHYS(page_to_pfn(page)))`,
 which is equivalent to: `(page - vmemmap) / 64 * 4096`. Where
 
 - page is address of a page descriptor
-- vmemmap is 0xffffea00_00000000
-- 64 is size of page descriptor, i.e. `sizeof(struct page)`
-- 4096 is PAGE_SIZE.
+- vmemmap is `0xffffea00_00000000`
+- `64` is size of page descriptor, i.e. `sizeof(struct page)`
+- `4096` is `PAGE_SIZE`.
 
 As 2's complement subtraction is the binary addition of the minuend to the 2's
 complement of the subtrahend (adding a negivative number is the same as
@@ -500,14 +508,16 @@ that specifies which physical address ranges are usable by the kernel and which
 are unavaiable.
 
 The kernel considers the following page frames as *reserved*:
+
 - Those falling in the unavaiable physical address ranges
 - Those containing the kernel's code and initialization data structures.
 
-A page contained in a reserved page frame can never be dynamically assigned or
-swapped out to disk.
+A page contained in a reserved page frame can never be dynamically assigned 
+or swapped out to disk.
 
-In the early stage of the boot sequence (TBD), the kernel queries the BIOS and learns the size of the physical memory. In recent computers, kernel also invoks
-a BIOS procedure to build a list of physical address ranges and their
+In the early stage of the boot sequence (*TBD*), the kernel queries the BIOS
+and learns the size of the physical memory. In recent computers, kernel also
+invoks a BIOS procedure to build a list of physical address ranges and their
 corresponding memory types.
 
 Later, the kernel executes the `default_machine_specific_memory_setup`
@@ -525,7 +535,7 @@ The BIOS-provides physical memory map is registered at `/sys/firmware/memmap`.
 
 #### Process Page Table
 
-TBD
+>*TBD*
 
 #### Kernel Page Table
 
@@ -554,15 +564,15 @@ It is initialized by `kernel_physical_mapping_init` which is invoked by
 After finalizing the page tables, `setup_arch` invokes `paging_init()` which
 invokes `free_area_init_nodes` to initialise all `pg_data_t` and zone data.
 
-```c
-setup_arch                             // @arch/x86/kernel/setup.c
+```
+setup_arch                            // @arch/x86/kernel/setup.c
     |
-    `init_memory_mapping               // @arch/x86/mm/init.c
+    `init_memory_mapping              // @arch/x86/mm/init.c
     |   |
-    |   `kernel_physical_mapping_init  // @arch/x86/mm/init_64.c
+    |   `kernel_physical_mapping_init // @arch/x86/mm/init_64.c
     |   |   |
     |   |   `sync_global_pgds
-    |   |   `__flush_tlb_all           // @arch/x86/include/asm/tlbflush.h
+    |   |   `__flush_tlb_all          // @arch/x86/include/asm/tlbflush.h
     |   |
     |   `__flush_tlb_all
     |
@@ -600,21 +610,23 @@ Processors can't synchronize their own TLB cache automatically because it is
 the kernel, and not the hardware, that decides when a mapping between a linear
 and a physical address is no longer valid.
 
-TLB flushing: (see `arch/x86/include/asm/tlbflush.h`)
+**TLB flushing**: (see `arch/x86/include/asm/tlbflush.h`)
 
-- `flush_tlb()` flushes the current mm struct TLBs
-- `flush_tlb_all()` flushes all processes TLBs
-- `flush_tlb_mm(mm)` flushes the specified mm context TLB's
-- `flush_tlb_page(vma, vmaddr)` flushes one page
-- `flush_tlb_range(vma, start, end)` flushes a range of pages
-- `flush_tlb_kernel_range(start, end)` flushes a range of kernel pages
-- `flush_tlb_others(cpumask, mm, va)` flushes TLBs on other cpus
+| func                               | desc                     |
+| ---------------------------------- | ------------------------ |
+| `flush_tlb()`                      | flushes the current mm struct TLBs |
+| `flush_tlb_all()`                  | flushes all processes TLBs |
+| `flush_tlb_mm(mm)`                 | flushes the specified mm context TLB's |
+| `flush_tlb_page(vma, vmaddr)`      | flushes one page |
+| `flush_tlb_range(vma, start, end)` | flushes a range of pages |
+| `flush_tlb_kernel_range(start, end)` | flushes a range of kernel pages |
+| `flush_tlb_others(cpumask, mm, va)` | flushes TLBs on other cpus |
 
 x86-64 can only flush individual pages or full VMs. For a range flush
 we always do the full VM. Might be worth trying if for a small range a
-few INVLPGs in a row are a win.
+few `INVLPG`(s) in a row are a win.
 
-Avoiding Flushing TLB:
+**Avoiding Flushing TLB**:
 
 As a general rule, any process switch implies changing the set of active page
 tables. Local TLB entries relative to the old page talbes must be flushed;
@@ -641,13 +653,13 @@ struct tlb_state {
 DECLARE_PER_CPU_SHARED_ALIGNED(struct tlb_state, cpu_tlbstate);
 ```
 
-see `mm_cpumask`, `cpumask_set_cpu`, `swtich_mm`.
+(see `mm_cpumask`, `cpumask_set_cpu`, `swtich_mm`)
 
 #### Referenced APIs and Source
 
 ##### Common in 3.2 and 4.4
 
-| file                                | Desc |
+| file                                | desc |
 | ----------------------------------- | ----------- |
 | `arch/x86/include/asm/page_types.h`    | common macros of x86 page table |
 | `arch/x86/include/asm/pgtable_64_types.h`| macros of x86_64 4-level paging |
@@ -659,7 +671,7 @@ see `mm_cpumask`, `cpumask_set_cpu`, `swtich_mm`.
 
 ##### Linux 3.2
 
-| file                                | Desc |
+| file                                | desc |
 | ----------------------------------- | ----------- |
 | `arch/x86/include/asm/segment.h` | segment layout and definitions |
 | `arch/x86/kernel/head_64.S`      | start in 32bit and switch to 64bit. |
@@ -669,7 +681,7 @@ see `mm_cpumask`, `cpumask_set_cpu`, `swtich_mm`.
 
 ##### Linux 4.4
 
-| file                        | Desc |
+| file                        | desc |
 | --------------------------- | ----------- |
 | `arch/x86/kernel/process.c` | per-CPU TSS segments. |
 
