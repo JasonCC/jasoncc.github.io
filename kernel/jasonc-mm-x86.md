@@ -362,7 +362,7 @@ Five type-conversion macros cast an unsigned integer into the required type:
 Kernel also provides several macros and functions to read or modify page tables
 entries.
 
-```c
+```
 - (pte|pmd|pud|pgd)_none
 - (pte|pmd|pud|pgd)_clear, ptep_get_and_clear()
 - set_(pte|pmd|pud|pgd)
@@ -576,9 +576,26 @@ setup_arch                            // @arch/x86/kernel/setup.c
     |   |
     |   `__flush_tlb_all
     |
-    `paging_init
+    `initmem_init                     // @arch/x86/mm/numa_64.c            
+    |   |                             // CONFIG_NUMA=y
+    |   `x86_numa_init                // @arch/x86/mm/numa.c
+    |       |
+    |       `numa_init(x86_acpi_numa_init) // CONFIG_ACPI_NUMA=y
+    |       `numa_init(dummy_numa_init)    // Fallback dummy NUMA init.
+    |           |
+    |           `dummy_numa_init      // Faking a NUMA node (0) descritpors
+    |           `numa_register_memblks
+    |               |
+    |               `setup_node_data  // Allocate and initialize *NODE_DATA*
+    |                                 // for a node on the local memory.
+    |
+    `paging_init                      // @arch/x86/mm/init_64.c
         |
-        `free_area_init_nodes
+        `free_area_init_nodes         // @mm/page_alloc.c
+            |
+            `free_area_init_node
+                |
+                `free_area_init_core  // *Set up the zone data structures*
 ```
 
 #### Fix-Mapped Linear Addresses
