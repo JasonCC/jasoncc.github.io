@@ -1,23 +1,27 @@
+---
+layout : default
+---
+
 # Notes on x86_64 Linux Memory Management Part 1: Memory Addressing
 
 ## x86 System Architecture Operating Modes and Features
 
 From chapter 2 of Intel SDM manual volume 3. IA-32 architecture (beginning
-with Intel386 processor family) provides extensive support for operating 
-system and system-development software. This support offers multiple modes of 
-operation, which include Read mode, protected mode, virtual 8086 mode, and 
+with Intel386 processor family) provides extensive support for operating
+system and system-development software. This support offers multiple modes of
+operation, which include Read mode, protected mode, virtual 8086 mode, and
 system management mode. These are sometimes referred to legacy modes.
 
-Intel 64 architecture supports almost all the system programming facilities 
+Intel 64 architecture supports almost all the system programming facilities
 available in IA-32 architecture and extends them to a new operating mode (
 IA-32e mode) that supports a 64-bit programming environment. IA-32e mode allows
 software to operate in one of two sub-modes:
 
 - 64-bit mode supports 64-bit OS and 64-bit applications
-- Compatibility mode allows most legacy software to run; it co-exist with 
+- Compatibility mode allows most legacy software to run; it co-exist with
   64-bit applications under 64-bit OS.
 
-The IA-32 system-level architecutre includes features to assist in the 
+The IA-32 system-level architecutre includes features to assist in the
 following operatins:
 
 - Memory management
@@ -29,10 +33,10 @@ following operatins:
 - Hardware resource and power management
 - Debugging and performance monitoring
 
-All Intel 64 and IA-32 processors enter real-address mode following a power-up 
-or reset. Software then initiates the swith from real-address mode to 
+All Intel 64 and IA-32 processors enter real-address mode following a power-up
+or reset. Software then initiates the swith from real-address mode to
 protected mode. If IA-32e mode operations is desired, software also initiates
-a switch from protected mode to IA-32e mode. (see Chapter 9, "Processor 
+a switch from protected mode to IA-32e mode. (see Chapter 9, "Processor
 Management and Initialization", SDM-vol-3).
 
 ## Memory Addressing
@@ -43,45 +47,45 @@ Three kinds of addresses:
 
 - **Logical address**, included in the machine language instructions to specify the address of an operand or of an instruction. Each logical address consists of a *segment* and *offset* (or *displacement*) that denotes the distance from the start of the segment to the actual address.
 
-- **Linear address** (also known as **virtual address**), a signal 32/64-bit 
+- **Linear address** (also known as **virtual address**), a signal 32/64-bit
 unsigned integer that can be used to address whole address space.
 
-- **Physical address**, used to address memory cells in memory chips. They 
-correspond to the electrical signals along the address pins of the 
+- **Physical address**, used to address memory cells in memory chips. They
+correspond to the electrical signals along the address pins of the
 microprocessor to the memory bus.
 
-The Memory Management Unit (MMU) transforms a logical address into a linear 
-address by means of a hardware circuit called a *segmentation unit*; 
-subsequently, a second hardware circuit called a *paging unit* transforms the 
+The Memory Management Unit (MMU) transforms a logical address into a linear
+address by means of a hardware circuit called a *segmentation unit*;
+subsequently, a second hardware circuit called a *paging unit* transforms the
 linear address into physical address. ("L->L->P" Model)
 
 ### Segmentation in Hardewre
 
 #### Segment Selector and Segmentation Registers
 
-A logical address consists of two parts: a segment identifier and an offset. 
+A logical address consists of two parts: a segment identifier and an offset.
 The segment identifier is a 16-bit field called the *Segment Selector*, while
 the offset is a 32-bit field (64-bit field in IA-32e mode?).
 
-To make it easy to retrieve segment selectors quickly, the processor provides 
+To make it easy to retrieve segment selectors quickly, the processor provides
 *segmentation registers* whose only purpose is to hold Segment Selectors; these
-registers are cs, ds, es, ss, fs, gs. Although there are only six of them, a 
-program can resue the same segmentation register for different purpose by 
+registers are cs, ds, es, ss, fs, gs. Although there are only six of them, a
+program can resue the same segmentation register for different purpose by
 saving its content in memory and them restoring it later.
 
 The cs register has another important function: it includes a 2-bit field that
 specifies Current Privilege Level (CPL) of the CPU. The value 0 denotes the
-highest privilege level (a.k.a. Ring 0), while the value 3 denotes the lowest 
-one (a.k.a. Ring 3). Linux uses only levels 0 and 3, which are respectively 
+highest privilege level (a.k.a. Ring 0), while the value 3 denotes the lowest
+one (a.k.a. Ring 3). Linux uses only levels 0 and 3, which are respectively
 called **Kernel Mode** and **User Mode**.
 
 #### Segmentation Descriptor
 
-Each segment is represented by an 8-byte **Segment Descriptor** that describes 
-the segment characteristics. Segment Descriptors are stored either in the 
+Each segment is represented by an 8-byte **Segment Descriptor** that describes
+the segment characteristics. Segment Descriptors are stored either in the
 **Global Descriptor Table (GDT)** or **Local Descriptor Table (LDT)**.
 
-There are several types of segments, and thus serveral types of Segment 
+There are several types of segments, and thus serveral types of Segment
 Descriptors. The following list shows the types that are widely used in Linux.
 
 *Code Segment Descriptor*
@@ -91,28 +95,28 @@ Descriptors. The following list shows the types that are widely used in Linux.
 
 *Data Segment Descriptor*
 >    Indicates that the Segment Descriptor refers to a data segment; it may be
->    included in either GDT or LDT. It has S flag set. Stack segments are 
+>    included in either GDT or LDT. It has S flag set. Stack segments are
 >    implemented by means of generic data segments.
 
 *Task State Segment Descriptor (TSSD)*
->    Indicates that the segment Descriptor refers to a Task State Segment 
->    (TSS), that is, a segment used to save the contents of the processor 
+>    Indicates that the segment Descriptor refers to a Task State Segment
+>    (TSS), that is, a segment used to save the contents of the processor
 >    registers; it can appear only in GDT. The S flag is set to 0.
 
 *Local Descriptor Table Descriptor (LDTD)*
->    Indicates that the Segment Descriptor refers to a segment containing an 
+>    Indicates that the Segment Descriptor refers to a segment containing an
 >    LDT; it can appear only in GDT. The S flag of such descriptor is set to 0.
 
 #### Fast Access to Segment Descriptors
 
-To speed up the translation of logical addresses into linear addresses, x86 
+To speed up the translation of logical addresses into linear addresses, x86
 processor provides an additional nonprogrammable register for each of the six
 segmentation register. Each nonprogrammable register (a.k.a *"shadow register"*
-or *"descriptor cache"*) contains 8-byte Segment Descriptor specified by the 
-Segment Selector contained in the corresponding segmentation register. Every 
+or *"descriptor cache"*) contains 8-byte Segment Descriptor specified by the
+Segment Selector contained in the corresponding segmentation register. Every
 time a Segment Selector is loaded in a segmentation register, the corresponding
-Segment Descriptor is loaded from memory into the CPU shadow register. From 
-then on, translating of logical addresses referring to that segment can be 
+Segment Descriptor is loaded from memory into the CPU shadow register. From
+then on, translating of logical addresses referring to that segment can be
 performed without accessing the GDT or LDT stored in main memory.
 
 #### Segmentation Unit
@@ -131,14 +135,14 @@ compatibility mode, segmentation functions just as it does using legacy 16-bit
 or 32-bit protected mode sematics.
 
 In 64-bit mode, segmentation is generally (but not completely) disabled,
-creating a flat 64-bit linear-address space. The processor treats the 
-segmentation base of CS, DS, ES, SS as zero, creating a linear address that is 
-equal to the effective address. The FS and GS segments are exceptions. These 
-segment registers (which hold segment base) can be used as additional base 
-registers in linear address calculations. They facilitate addressing local 
+creating a flat 64-bit linear-address space. The processor treats the
+segmentation base of CS, DS, ES, SS as zero, creating a linear address that is
+equal to the effective address. The FS and GS segments are exceptions. These
+segment registers (which hold segment base) can be used as additional base
+registers in linear address calculations. They facilitate addressing local
 data and certain operating system data structures.
 
-Note that the processor does not perform segment limit checks at runtime in 
+Note that the processor does not perform segment limit checks at runtime in
 64-bit mode.
 
 ##### Segment Selector
@@ -163,7 +167,7 @@ descriptors. An entry in the segment descriptor table can be 8 bytes. System
 segment descriptors are expaned to 16 bytes (occupying the space of the two
 entries).
 
-GDTR and LDTR registers are expanded to hold 64-bit base addres. The corresponding pseudo-descriptor is 80 bits (64 bits "Base Address" + 16 bits "Limit"). 
+GDTR and LDTR registers are expanded to hold 64-bit base addres. The corresponding pseudo-descriptor is 80 bits (64 bits "Base Address" + 16 bits "Limit").
 
 The following system descriptors expand to 16 bytes:
 
@@ -171,7 +175,7 @@ The following system descriptors expand to 16 bytes:
 - IDT gate descriptor (see 6.14.1, "64-Bit Mode IDT")
 - LDT and TSS descriptors (see 7.2.3, "TSS Descriptor in 64-bit mode")
 
-### Segmentation in Linux 
+### Segmentation in Linux
 
 Linux prefers paging to segmentation for the following reasons:
 
@@ -179,31 +183,31 @@ Linux prefers paging to segmentation for the following reasons:
   register value, that is, when the share the same set of linear addresses.
 
 - One of the design objectives of Linux is portability to a wide range of
-  architecture. RISC architectures in particular have limited support for 
+  architecture. RISC architectures in particular have limited support for
   segmentation.
 
 In Linux, all base addresses of user mode code/data segments and kernel code/data segments are set to 0.
 
-The corresponding Segment Selectors are defined by the macros `__USER_CS`, 
+The corresponding Segment Selectors are defined by the macros `__USER_CS`,
 `__USER_DS`, `__KERNEL_CS`, and `__KERNEL_DS`, respectively. To address the
 kernel core segment, for instance, the kernel just loads the value yielded by
 the `__KERNEL_CS` macro into the cs segmentation register.
 
 The *Current Privilege Level* of the CPU indicates whether the process is in
-User Mode or Kernel Mode and is specified by the *RPL* field of the Segment 
+User Mode or Kernel Mode and is specified by the *RPL* field of the Segment
 Selector stored in the *cs* register.
 
-When saving a pointer to an instruction or to a data structure, the kernel 
+When saving a pointer to an instruction or to a data structure, the kernel
 does not need to store the Segment Selector component of the logical address,
 because the *ss* register contains the Segment Selector. As an example, when
-the kernel invokes a function, it executes a `call` assembly language 
+the kernel invokes a function, it executes a `call` assembly language
 instruction specifiying just the *Offset* component of its logical address;
 the Segment Selector is implicitly selected as the one referred to by the *cs*
-register. Because there is just one segment of type "executable in Kernel 
+register. Because there is just one segment of type "executable in Kernel
 Mode", namely the code segment identified by `__KERNEL_CS`, it sufficient to
-load `__KERNEL_CS` into *cs* whenever the CPU switched to Kernel Mode. The 
-same argument goes for pointers to kernel data structures (implicitly using 
-the *ds* register), as well as for pointers to user data structures (the 
+load `__KERNEL_CS` into *cs* whenever the CPU switched to Kernel Mode. The
+same argument goes for pointers to kernel data structures (implicitly using
+the *ds* register), as well as for pointers to user data structures (the
 kernel explicitly uses the *es* register).
 
 #### Linux GDT
@@ -211,23 +215,23 @@ kernel explicitly uses the *es* register).
 In uniprocessor systems there is only one GDT, while in multiprocessor systems
 there is one GDT for every CPU in the system.
 
-`init_per_cpu_gdt_page` if `CONFIG_X86_64_SMP` is set or `gtd_page` otherwise. 
+`init_per_cpu_gdt_page` if `CONFIG_X86_64_SMP` is set or `gtd_page` otherwise.
 
 see label `early_gdt_descr` and `early_gdt_descr_base` in `head_64.S`.
 
 - Four user and kernel code and data segments
 
-- Task State Segment (TSS), this is different from each processor in the 
+- Task State Segment (TSS), this is different from each processor in the
 system. The linear space corresponding to a TSS is a small subset of the
-linear address space corresponding to the kernel data segment. The Task 
-State Segments are sequentially stored in the per-CPU `init_tss` array on 
-SMP system. (it's `cpu_tss` since 4.x kernel). See how Linux uses TSSs in 
+linear address space corresponding to the kernel data segment. The Task
+State Segments are sequentially stored in the per-CPU `init_tss` array on
+SMP system. (it's `cpu_tss` since 4.x kernel). See how Linux uses TSSs in
 chapter 3 in ULK3, and `__switch_to` in the source.
 
-- A segment including the default Local Descriptor Table (LDT), usually shared 
+- A segment including the default Local Descriptor Table (LDT), usually shared
 by all processes.
 
-- Three *Thread Local Storage (TLS)* segments. see `set_thread_area(2)` and 
+- Three *Thread Local Storage (TLS)* segments. see `set_thread_area(2)` and
 `get_thread_area(2)`.
 
 - Three segments related to Advanced Power Management (APM).
@@ -250,13 +254,13 @@ Paging unit is enabled by setting the *PG* flag of a control register named *cr0
 
 #### Regular Paging
 
-Fields in 32bit linear address space: 
+Fields in 32bit linear address space:
 
     - 2 level page tables
     - Directory (10 bits), Table (10 bits), Offset (12 bits)
-    - 
+    -
 
-Fields in 64bit linear address space: 
+Fields in 64bit linear address space:
 
     - 4 level page tables
     - ...
@@ -269,11 +273,11 @@ The entries of Page Directories and Page Tables have the same structure. Each en
 - *Dirty flag*
 - *Read/Write flag*: contains the access right (Read/Write or Read) of page or of the page table.
 - *User/Supervisor flag*: contains privilege level required to access the page or of the page table.
-- *PCD and PWT flag*: contains the way the page or Page Table is handled by the hardware cache. 
-    - PCD: page-level cache disable 
+- *PCD and PWT flag*: contains the way the page or Page Table is handled by the hardware cache.
+    - PCD: page-level cache disable
     - PWT: page-level write-through
 - *Page Size flag*: applies only to Page Directory entries. If it's set, the entry refers to a 2MB, or 4MB long page frame.
-- *Global flag*: applies only to Page Table entries. This flag as introduced to prevent frequently used pages from being flushed from *TLB cache*. It works only if the Page Global Enable (PGE) flag of register *CR4* is set.   
+- *Global flag*: applies only to Page Table entries. This flag as introduced to prevent frequently used pages from being flushed from *TLB cache*. It works only if the Page Global Enable (PGE) flag of register *CR4* is set.
 
 
 #### Extended/PAE Paging (Large Pages)
@@ -285,7 +289,7 @@ PAE stands for Physical Address Extension Paging Mechanism
 | Page size                   | 4KB                |
 | --------------------------- | ------------------ |
 | Number of address bits used | 48                 |
-| Number of paging leveles    | 5                  |
+| Number of paging leveles    | 4                  |
 | Linear address splitting    | 9 + 9 + 9 + 9 + 12 |
 
 #### Hardware Cache
@@ -310,7 +314,7 @@ When the *cr3* control register of a CPU is modified, the hardware automatically
 
 ### Paging in Linux
 
-Linux adopts a common paging model that fits both 32-bit and 64-bit architectures. Starting with version 2.6.11, a four-level paging model has been adopted. 
+Linux adopts a common paging model that fits both 32-bit and 64-bit architectures. Starting with version 2.6.11, a four-level paging model has been adopted.
 
 - Page Global Directory
 - Page Upper Directory
@@ -323,7 +327,7 @@ Linux adopts a common paging model that fits both 32-bit and 64-bit architecture
          9             9          9            9        12
     [ Global DIR | Upper DIR | Middle DIR |  Table  | Offset ]
          |             |          |            |        |
-cr3  +   v     +       v     +    v     +      v    +   v ==> physical address 
+cr3  +   v     +       v     +    v     +      v    +   v ==> physical address
                                                     |
                                                     `==> page frame
 ```
@@ -334,9 +338,9 @@ When a process switch occurs, the *cr3* is switched accordingly. Thus, when the 
 
 Starting with v4.12, Intel's 5-level paging support is enabled if `CONFIG_X86_5LEVEL` is set. See the following links to find more.
 
-[Intel's 5-Level Paging Support Being Prepped For Linux 4.12](https://www.phoronix.com/scan.php?page=news_item&px=Intel-5-LVL-Paging-Linux-4.12)
-[x86: 5-level paging enabling for v4.12, Part 3](http://lkml.iu.edu/hypermail/linux/kernel/1703.3/01979.html)
-[5-Level Paging and 5-Level EPT](https://software.intel.com/sites/default/files/managed/2b/80/5-level_paging_white_paper.pdf)
+- [Intel's 5-Level Paging Support Being Prepped For Linux 4.12](https://www.phoronix.com/scan.php?page=news_item&px=Intel-5-LVL-Paging-Linux-4.12)
+- [x86: 5-level paging enabling for v4.12, Part 3](http://lkml.iu.edu/hypermail/linux/kernel/1703.3/01979.html)
+- [5-Level Paging and 5-Level EPT](https://software.intel.com/sites/default/files/managed/2b/80/5-level_paging_white_paper.pdf)
 
 #### The Linear Address Fields
 
@@ -363,7 +367,7 @@ entries.
 - `set_(pte|pmd|pud|pgd)`
 - `pte_same(a,b)`
 - `pmd_large(e)` return 1 if the Page Middle Directoy entry e refers to a large page (2MB or 4MB), 0 otherwise.
-- `pmd_bad` yields 1 if the entry points to a bad Page Table, that is at least 
+- `pmd_bad` yields 1 if the entry points to a bad Page Table, that is at least
 one of the following conditions applies: (see `_KERNPG_TABLE`)
     - The page is not in main memory (*Present* flag cleared).
     - The page allows only Read access (*Read/Write* flags cleared).
@@ -386,14 +390,14 @@ Page allocation functions:
 - `pte_free(pte)`, `pte_free_kernel(pte)`
 - `clear_page_range(mmu, start, end)`
 
-The `index` field of the page descriptor used as a pgd page is pointing to the 
+The `index` field of the page descriptor used as a pgd page is pointing to the
 corresponding memory descriptor `mm_struct`. (see `pgd_set_mm`)
 
-Global variable `pgd_list` holds the doubly linked list of pgd(s) by linking `page->lru` field of that pgd page. (see `pgd_list_add`) 
+Global variable `pgd_list` holds the doubly linked list of pgd(s) by linking `page->lru` field of that pgd page. (see `pgd_list_add`)
 
 Common kernel code path: `execve()`
 
-```
+```c
 do_execve_common @fs/exec.c
     bprm_mm_init
         mm_alloc @kernel/fork.c
@@ -402,21 +406,21 @@ do_execve_common @fs/exec.c
                 mm_alloc_pgd
                     pgd_alloc @arch/x86/mm/pgtable.c
                         // 1. allocates a new page via zone allocator
-                        // 2. stores the new pgd page in the corresponding 
+                        // 2. stores the new pgd page in the corresponding
                         //    memory descriptor
                         // 3. requires pgd_lock spinlock
-                        // 5. invokes pgd_ctor to 
+                        // 5. invokes pgd_ctor to
                         //      a. copy/clone master kernel page tables
                         //      b. stores the corresonping memory descriptor in
-                        //         the index field of the page descriptor of 
+                        //         the index field of the page descriptor of
                         //         this pgd page.
-                        //      c. add pgd page to the global doubly linked 
+                        //      c. add pgd page to the global doubly linked
                         //         list pgd_list by linking page->lru.
 ```
 
 #### Virtual Memory Layout
 
-See Documentation/x86/x86_64/mm.txt in the kernel to find the latest 
+See Documentation/x86/x86_64/mm.txt in the kernel to find the latest
 description of the memory map.
 
 The following is grabbed from v3.2.
@@ -454,7 +458,7 @@ but we support up to 46 bits. This expands into MBZ space in the page tables.
 
 #### A little interesting `page_address()` implemenation on x86_64
 
-A linear address can be calculated by `__va(PFN_PHYS(page_to_pfn(page)))`, 
+A linear address can be calculated by `__va(PFN_PHYS(page_to_pfn(page)))`,
 which is equivalent to: `(page - vmemmap) / 64 * 4096`. Where
 
 - page is address of a page descriptor
@@ -462,10 +466,10 @@ which is equivalent to: `(page - vmemmap) / 64 * 4096`. Where
 - 64 is size of page descriptor, i.e. `sizeof(struct page)`
 - 4096 is PAGE_SIZE.
 
-As 2's complement subtraction is the binary addition of the minuend to the 2's 
-complement of the subtrahend (adding a negivative number is the same as 
-subtracting a positive one). The assembly code doing that calculation looks 
-like the following. Note that `0x1600_00000000` is the corresponding 2's 
+As 2's complement subtraction is the binary addition of the minuend to the 2's
+complement of the subtrahend (adding a negivative number is the same as
+subtracting a positive one). The assembly code doing that calculation looks
+like the following. Note that `0x1600_00000000` is the corresponding 2's
 complement, and by "x86_64-abi-0.98", which requires compiler to use `movabs`
 in this case.
 
@@ -491,7 +495,7 @@ CONFIG_SPARSEMEM_VMEMMAP=y
 
 #### Physical Memory Layout
 
-During the initialization phase the kernel must build a *physical address map* 
+During the initialization phase the kernel must build a *physical address map*
 that specifies which physical address ranges are usable by the kernel and which
 are unavaiable.
 
@@ -499,15 +503,15 @@ The kernel considers the following page frames as *reserved*:
 - Those falling in the unavaiable physical address ranges
 - Those containing the kernel's code and initialization data structures.
 
-A page contained in a reserved page frame can never be dynamically assigned or 
+A page contained in a reserved page frame can never be dynamically assigned or
 swapped out to disk.
 
 In the early stage of the boot sequence (TBD), the kernel queries the BIOS and learns the size of the physical memory. In recent computers, kernel also invoks
-a BIOS procedure to build a list of physical address ranges and their 
+a BIOS procedure to build a list of physical address ranges and their
 corresponding memory types.
 
-Later, the kernel executes the `default_machine_specific_memory_setup` 
-function, which builds the physical addresses map. (see `setup_memory_map`, 
+Later, the kernel executes the `default_machine_specific_memory_setup`
+function, which builds the physical addresses map. (see `setup_memory_map`,
 `setup_arch`)
 
 Variables describing the kernel's physical memory layout
@@ -525,32 +529,32 @@ TBD
 
 #### Kernel Page Table
 
-The kernel maintains a set of page tables for its own use, rooted at a 
-so-called *master kernel Page Global Directory*. After system initialization, 
-this set of page tables is never directly used by any process or kernel 
-thread; rather, the highest entries of of the master kernel Page Global 
-Directory are the reference model for the corresponding entries of the Page 
+The kernel maintains a set of page tables for its own use, rooted at a
+so-called *master kernel Page Global Directory*. After system initialization,
+this set of page tables is never directly used by any process or kernel
+thread; rather, the highest entries of of the master kernel Page Global
+Directory are the reference model for the corresponding entries of the Page
 Global Directories of every regular process in the system.
 
 ##### Provisional Kernel Page Table
 
-A provisional Page Global Directory is initialized statically during kernel 
-compilation, while it is initialized by the `startup_64` assembly language 
+A provisional Page Global Directory is initialized statically during kernel
+compilation, while it is initialized by the `startup_64` assembly language
 function defined in `arch/x86/kernel/head_64.S`.
 
-The provisional Page Global Directory is contained in the `swapper_pg_dir` 
+The provisional Page Global Directory is contained in the `swapper_pg_dir`
 (`init_level4_pgt`).
 
 ##### Final Kernel Page Table
 
 The master kernel Page Global Directory is still stored in `swapper_pg_dir`.
-It is initialized by `kernel_physical_mapping_init` which is invoked by 
+It is initialized by `kernel_physical_mapping_init` which is invoked by
 `init_memory_mapping`.
 
 After finalizing the page tables, `setup_arch` invokes `paging_init()` which
 invokes `free_area_init_nodes` to initialise all `pg_data_t` and zone data.
 
-```
+```c
 setup_arch                             // @arch/x86/kernel/setup.c
     |
     `init_memory_mapping               // @arch/x86/mm/init.c
@@ -569,35 +573,35 @@ setup_arch                             // @arch/x86/kernel/setup.c
 
 #### Fix-Mapped Linear Addresses
 
-To associate a physical address with a fix-mapped linear address, the kernel 
+To associate a physical address with a fix-mapped linear address, the kernel
 uses the following:
 
-- `fix_to_virt(idx)` 
-- `set_fixmap(idx,phys)`, `set_fixmap_nocache(idx,phys)` 
+- `fix_to_virt(idx)`
+- `set_fixmap(idx,phys)`, `set_fixmap_nocache(idx,phys)`
 - `clear_fixmap(idx)`
 
 #### Handling the Hardware Cache and the TLB
 
 ##### Handling the Hardware Cache
 
-Hardware chaces are addressed by cache lines. The `L1_CACHE_BYTES` macro 
+Hardware chaces are addressed by cache lines. The `L1_CACHE_BYTES` macro
 yields the size of a cache line in bytes. On recently Intel models, it yields
 value 64.
 
 `CONFIG_X86_L1_CACHE_SHIFT=6`
 
-Cache synchronization is performed automatically by the x86 microprocessors, 
-thus the Linux kernel for this kind of processor does not perform any hardware 
+Cache synchronization is performed automatically by the x86 microprocessors,
+thus the Linux kernel for this kind of processor does not perform any hardware
 cache flushing.
 
 ##### Handling the TLB
 
-Processors can't synchronize their own TLB cache automatically because it is 
-the kernel, and not the hardware, that decides when a mapping between a linear 
+Processors can't synchronize their own TLB cache automatically because it is
+the kernel, and not the hardware, that decides when a mapping between a linear
 and a physical address is no longer valid.
 
 TLB flushing: (see `arch/x86/include/asm/tlbflush.h`)
- 
+
 - `flush_tlb()` flushes the current mm struct TLBs
 - `flush_tlb_all()` flushes all processes TLBs
 - `flush_tlb_mm(mm)` flushes the specified mm context TLB's
@@ -607,15 +611,15 @@ TLB flushing: (see `arch/x86/include/asm/tlbflush.h`)
 - `flush_tlb_others(cpumask, mm, va)` flushes TLBs on other cpus
 
 x86-64 can only flush individual pages or full VMs. For a range flush
-we always do the full VM. Might be worth trying if for a small range a 
+we always do the full VM. Might be worth trying if for a small range a
 few INVLPGs in a row are a win.
 
 Avoiding Flushing TLB:
 
-As a general rule, any process switch implies changing the set of active page 
-tables. Local TLB entries relative to the old page talbes must be flushed; 
-this is done when kernel writes the address of the new PGD/PML4 into the *cr3* 
-control register. The kernel succeeds, however, in avoiding TLB flushes in the 
+As a general rule, any process switch implies changing the set of active page
+tables. Local TLB entries relative to the old page talbes must be flushed;
+this is done when kernel writes the address of the new PGD/PML4 into the *cr3*
+control register. The kernel succeeds, however, in avoiding TLB flushes in the
 following cases:
 
 - When performing a process switch between two regular processes that uses the same set of page tables.
@@ -624,9 +628,9 @@ following cases:
 ##### Lazy TLB Handling
 
 The per-CPU variable `cpu_tlbstate` is used for implementing lazy TLB mode.
-Furthermore, each memory descriptor includes a `cpu_vm_mask_var` field that 
-stores the indices of the CPUs that should receive *Interprocessor Interrupts* 
-related to TLB flushing. This field is meaningful only when the memory 
+Furthermore, each memory descriptor includes a `cpu_vm_mask_var` field that
+stores the indices of the CPUs that should receive *Interprocessor Interrupts*
+related to TLB flushing. This field is meaningful only when the memory
 descriptor belongs to a process currently in execution.
 
 ```
@@ -674,4 +678,8 @@ see `mm_cpumask`, `cpumask_set_cpu`, `swtich_mm`.
 - [What every programmer should know about memory, Part 1](https://lwn.net/Articles/250967/)
 - [Memory part 2: CPU caches](https://lwn.net/Articles/252125/)
 - [Memory part 3: Virtual Memory](https://lwn.net/Articles/253361/)
+
+
+[back](../)
+
 
