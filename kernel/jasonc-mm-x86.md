@@ -564,8 +564,12 @@ It is initialized by `kernel_physical_mapping_init` which is invoked by
 After finalizing the page tables, `setup_arch` invokes `paging_init()` which
 invokes `free_area_init_nodes` to initialise all `pg_data_t` and zone data.
 
+The following is the corresponding call-graph using linux-3.2.
+
 ```
 setup_arch                            // @arch/x86/kernel/setup.c
+    |
+    `init_gbpages
     |
     `init_memory_mapping              // @arch/x86/mm/init.c
     |   |
@@ -707,7 +711,6 @@ DECLARE_PER_CPU_SHARED_ALIGNED(struct tlb_state, cpu_tlbstate);
 - [What every programmer should know about memory, Part 1](https://lwn.net/Articles/250967/)
 - [Memory part 2: CPU caches](https://lwn.net/Articles/252125/)
 - [Memory part 3: Virtual Memory](https://lwn.net/Articles/253361/)
-
 
 [back](../)
 

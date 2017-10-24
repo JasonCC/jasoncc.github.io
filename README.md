@@ -1,6 +1,7 @@
 # Linux Kernel
 
 - [Notes on x86_64 Linux Memory Management Part 1](kernel/jasonc-mm-x86.md)
+- [System V Reboot is Funny](kernel/sysvinit-reboot-is-funny.md)
 - [Syscalls](kernel/syscall.md)
 - [Kernel and Modules Build](kernel/kernel-and-modules-build.md)
 - [Examining Load Average](kernel/examining-load-average.md)
