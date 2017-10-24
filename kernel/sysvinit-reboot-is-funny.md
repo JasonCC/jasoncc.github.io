@@ -5,7 +5,7 @@ layout : default
 # System V Reboot is Funny
 
 The system reboot process can be quite involved. Especially on some old
-systems which adopts the older System-V Init system, e.g. sysvinit-2.85.
+systems which adopt the older System-V Init system, e.g. sysvinit-2.85.
 
 Under the older sysvinit release, both `reboot` and `poweroff` are just a 
 symlink pointing to `halt` (`/sbin/halt`).
@@ -23,7 +23,7 @@ The whole process looks like the following:
 main @sysvinit-2.85/src/halt.c
 |
 `chdir("/")
-`get_runlevel // get runlevel 4.
+`get_runlevel // e.g. get runlevel 4.
 `do_shutdown(do_reboot ? "-r" : "-h", tm)
 `open("/halt", O_RDWR|O_CREAT, 0644)
 `execve("/sbin/shutdown", ["shutdown", "-r", "now"], [/* 19 vars */]);
@@ -38,14 +38,14 @@ main @sysvinit-2.85/src/halt.c
                 |
                 v
                 main @src/init.c
-                | /* Open the fifo /dev/initctl and write a command asking runlevel 6. */
+                | /* Open the FIFO /dev/initctl and write a command asking runlevel 6. */
                 `telinit
                     |
        +------------+
        |
        v
 /* (pid 1) init got a change runlevel request through the
- * init's control file. */
+ * init's control FIFO. */
 fifo_new_level
     read_inittab --\ // change to runlevel 6 by executing "l6:6:wait:/etc/rc.d/rc 6"
     setproctitle   |
