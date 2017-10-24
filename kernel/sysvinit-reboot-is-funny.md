@@ -83,15 +83,27 @@ S01reboot -> ../init.d/halt // This is a really workhourse! It is doing a lot,
                     `kernel_restart
                         |
                         `kernel_restart_prepare
+                        |   |
+                        |   `blocking_notifier_call_chain
+                        |   |   `notifier_call_chain
+                        |   |       `...
+                        |   `system_state = SYSTEM_RESTART
+                        |   `usermodehelper_disable
+                        |   `device_shutdown
+                        |   `syscore_shutdown
+                        |
+                        `kmsg_dump(KMSG_DUMP_RESTART)
+                        `machine_restart
                             |
-                            `blocking_notifier_call_chain
-                            |   `notifier_call_chain
-                            |       `...
-                            `system_state = SYSTEM_RESTART
-                            `usermodehelper_disable
-                            `device_shutdown
-                            `syscore_shutdown
-
+                            `native_machine_restart
+                                `machine_shutdown
+                                `__machine_emergency_restart(0)
+                                    |
+                                    `native_machine_emergency_restart
+                                        |
+                                        `acpi_reboot
+                                            |
+                                            `acpi_reset
 ```
 
 [back](../)
