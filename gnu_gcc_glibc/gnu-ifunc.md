@@ -7,9 +7,9 @@ layout: default
 ## GNU "IFUNC"/"ifunc"/"STT_GNU_IFUNC" and Runtime Dispathing
 
 Since Binutils version 2.20.1 or higher and GNU C Library version 2.11.1, there
-is GNU extension to ELF format that adds a new function type `STT_GNU_IFUNC`,
-the "I" in "IFUNC" stands for indirect, as the extension allows for the
-creation of indirect functions resolved at runtime.
+is a GNU extension to ELF format that adds a new function type `STT_GNU_IFUNC`.
+The "I" in "IFUNC" stands for indirect, as the extension allows for creation
+of indirect functions resolved at runtime.
 
 Each "IFUNC" symbol has an associated resolver function. This function is
 responsible for returning the correct version of the function to utilize. 
@@ -48,7 +48,7 @@ static void *resolve_foo(void)
 
 The function call is resolved via the normal procedure linkage table (PLT). The
 PLT entry is changed to point to the desired version of the funtion, either at 
-load time of at the first call. The PLT initially points to `resolve_foo`,which
+load time or at the first call. The PLT initially points to `resolve_foo`,which
 is called only once, and the return value from it replaces its own entry in the
 PLT.
 
@@ -69,7 +69,7 @@ available for five years and has not made it into some order enterprise
 distributions.
 
 As of GCC 4.8, GCC adds a new builtin designed to simplify the 
-`__builtin_cpu_support()`. This builtin takes a string to the feature name,
+`__builtin_cpu_supports()`. This builtin takes a string to the feature name,
 such as "sse4.1" or "avx2", and returns `true` or `false`, depending on what 
 the processor supports. The function `cpu_has_sse42/avx2` above can be 
 implemented as the following.
@@ -85,7 +85,7 @@ int cpu_has_avx2() {
 
 ## An Example in Glibc on x86
 
-A simple case related to kernel is system call wrapper `gettimeofday()`. 
+A simple case related to kernel is the system call wrapper `gettimeofday()`. 
 For x86_64, it's actually an "ifunc" which determines whether it should invoke
 the corresponding syscall via vDSO or not. The implementation looks like following. (glibc-2.25-49-gbc5ace67fe)
 
@@ -145,6 +145,9 @@ for implmenting indirect functions, otherwise, use the old behavior,
   __ifunc (type_name, __libc_##name, expr, arg, init)                   \
   strong_alias (__libc_##name, name);
 #endif /* !HAVE_GCC_IFUNC  */
+
+#define libc_ifunc_hidden(redirected_name, name, expr)                  \
+  __ifunc_hidden (redirected_name, name, expr, void, INIT_ARCH)
 ```
 
 ## ELF and x86/x86_64 ABIs
@@ -164,7 +167,8 @@ execution. For example, the reason that it's possible to invoke `execve()` on
 shell scripts beginning with the (hash bang/shebang) line `#! <prog> <args>` is
 because there is an explicit handler, `binfmt_script`, dedicated to parsing 
 files with that prefix, executing the program, and then passing the script to
-that program.
+that program. That recursion almost always ends with the invocation of an ELF
+binary program.
 
 These `linux_binfmt` handler implementations, along with common `execve()`, can
 be found in `${KSRC}/fs/binfmt_*.c` and `${KSRC}/fs/exec.c`
@@ -172,44 +176,48 @@ be found in `${KSRC}/fs/binfmt_*.c` and `${KSRC}/fs/exec.c`
 While Linux supports multiple executable file formats, the most commonly used 
 format on Linux is the Executable and Linkable Format (ELF). The ELF standard
 was published by the UNIX System Laboratories, and was intended to provid a
-single executable format that would "extend across multiple operation 
+single executable format that would "extend across multiple operating 
 environments" (UNIX System Laboratories, 2001).
 
-ELF defines three different object types: relocatable files, executable files,
-and shared objects. Relocatable files are designed to be combined with other
-object files by the linker to produce executable or shared object files.
-Executable files are designed to be invoked via `execve()`. Shared object files
-are designed to be linked, either by the linker at build time, or at load time
-by the dynamic linker. Shared object files allow for code to be referenced via
-shared libraries.
+ELF defines three different object types: **relocatable files**, **executable files**, and **shared objects**. Relocatable files are designed to be combined
+with other object files by the linker to produce executable or shared object 
+files. Executable files are designed to be invoked via `execve()`. Shared 
+object files are designed to be linked, either by the linker at build time, or 
+at load time by the dynamic linker. Shared object files allow for code to be 
+referenced via shared libraries.
 
 The ELF format is comprised of two complementary views.
 
-The first view, linking view, is comprised of the program sections. Sections 
-group various aspects such as code and data into congiuous regions within the
-the ELF file. The linker is responsible for concatenating duplicate sections 
-when linking multiple object files. For example, if object file `foo.o` defines
-a funcion `foo()` and a variable `x`, and object file `bar.o` defines a 
-function `bar()` and a variable `y`, the linker would produce an object file
-whose code section contained functions `foo()` and `bar()` and whose data 
-section contained variables `x` and `y`.
+**The first view, linking view**, is comprised of the program sections.
+Sections group various aspects such as code and data into congiuous regions 
+within the the ELF file. The linker is responsible for concatenating duplicate 
+sections when linking multiple object files. For example, if object file 
+`foo.o` defines a funcion `foo()` and a variable `x`, and object file `bar.o` 
+defines a function `bar()` and a variable `y`, the linker would produce an 
+object file whose code section contained functions `foo()` and `bar()` and 
+whose data section contained variables `x` and `y`.
 
 The ELF specification defines special sections that are allocated for specific
 tasks, such as holding code or read-only data. These special sections can be
 identified by leading dot in their name. Developers are also free to define 
 their own custom sections.
 
-A sampling of some common special sections and their usage is describled below:
+A sampling of some common special sections and their usage is describled below.
 
 - `.text` Holds executable instructions.
-- `.bss` Holds uninitialized, i.e. initialized to zero, dat. Since all of the
-  variables in the this section have the same value, zero, they aren't 
-  physically stored in the file. When the file is loaded, the corresponding 
-  memory region is zeroed.
+
+- `.bss` Holds uninitialized, i.e. initialized to zero, data. Since all of the
+  variables in this section have the same value, zero, they aren't physically
+  stored in the file. When the file is loaded, the corresponding memory region
+  is zeroed.
+
 - `.data` Holds initialized data.
+
 - `.rodata` Holds read-only data.
+
 - `.strtab` A string table containing a NULL-terminated string of each symbol
   or section name. The first and last entries are NULL bytes.
+
 - `.symtab` A symbol table containing entries for locating symbols. Includes 
   the symbol name, as an index into `.strtab` sections, the symbol type, the
   symbol size, etc.
@@ -219,7 +227,7 @@ pseudo-op. Some popular special sections can also be selected through their
 corresponding pseudo-ops, e.g., `.data`, or `.text`, which switches to the
 `.data` or `.text` sections, respectively. 
 
-The second view, execution view, is comprised of segments. Unlike sections,
+**The second view, execution view**, is comprised of segments. Unlike sections,
 which represent the file layout, segments represent the virtual memory segments
 during execution. These segments are described in the Program Header table, 
 which contains the information needed by the kernel to struct the code in 
@@ -262,7 +270,7 @@ true that with dynamic linking the full library, including unused objects, will
 be mapped into virtual address space of the process, that doesn't necessarily
 translate to that full library being loaded into physical memory. Each page of 
 the library will only loaded from disk into memory once it has been accessed, 
-and once these pages have been loaded the can be shared between multiple 
+and once these pages have been loaded they can be shared between multiple 
 executables.
 
 The increased update effort is caused by the fact that the only way to update 
@@ -293,12 +301,12 @@ subsequent meanings can be found within the ELF specification. A few of the
 important types are described below.
 
 - `DT_NEEDED` Array elements marked with this type represent the names of 
-  shared libraries required for external symbol resolution. THe names can 
+  shared libraries required for external symbol resolution. The names can 
   either be the "SONAME" or the filesystem path, relative or absolute. The
   value associated with this type is an offset into the file's string table.
   A list of values of this type can be obtained either by reading the section,
   with a command like `readelf -d`, or at execution time via setting the 
-  `LD_TRACE_LOADED_OBJECTS` environment variable. For convenience, `ldd` is a
+  `LD_TRACE_LOADED_OBJECTS` environment variable. For convenience, `ldd` is an
   utility that will set the environment variable and execute the program.
 
 - `DT_SONAME` The shared object name of the file. The value associated with 
@@ -355,12 +363,12 @@ this leads to increased memory usage.
 Obviously binding a large number of symbols before execution begins can be 
 devastating to the application's load time. Even worse, there is no guarantee
 that all of these resolved symbols will actually be needed during execution. In
-order to alleviate this issue, ELF supports lazy binding, that is, where 
+order to alleviate this issue, ELF supports **lazy binding**, that is, where 
 symbols are resolved the first time they are actually used. To accommodate 
-this, function calls occur indirectly through the Procedure Linkage Table (PLT)
-and Gobal Offset Table (GOT). The GOT contains the calculated addresses of the
-relocated symbols, whilie PLT is used as a trampoline to that address for 
-function function calls.
+this, function calls occur indirectly through the **Procedure Linkage Table** (
+**PLT**) and **Gobal Offset Table** (**GOT**). The GOT contains the calculated 
+addresses of the relocated symbols, whilie PLT is used as a *trampoline* to 
+that address for function function calls.
 
 Each entry in the PLT, except the first, corresponds to a special function. 
 Rather than directly calling the relocated symbol, the code jumps to the 
@@ -369,7 +377,7 @@ to the address has been bound, the GOT address points back to the next
 instruction in the PLT entry, that is, the next instruction after the PLT's
 first jump instruction. This next instruction pushes the symbol's relocation
 offset onto the stack. Then the next instruction jumps to the first PLT entry,
-which invokes the dynamic linker to resolve the reolocation offset pushed onto
+which invokes the dynamic linker to resolve the relocation offset pushed onto
 the stack. Once the dynamic linker has calculated the relocated address, it
 updates the relevant entry in the GOT and them jumps to the relocated function.
 
@@ -397,7 +405,7 @@ The method for addressing the GOT in the PLT works slightly differently between
 the 32- and 64-bit ELF formats. In both specifications, the address of the GOT
 is encoded relative to the instruction pointer. For 64-bit PIC, access to the 
 GOT is encoded as an offset relative to the current instruction pointer. This
-straightforward approach is possible because of *RIP*-relative addressing, 
+straightforward approach is possible because of *RIP-relative addressing*, 
 which is only available in 64-bit mode. For 32-bit PIC, ELF ABI reserves the 
 *EBX* register for holding the base address of the GOT.
 
@@ -424,32 +432,32 @@ added.
 
 - How does Glibc use `elf_ifunc_invoke` to implement runtime dispatching?
 
-# References
+## References
 
-## Processing ELF
+### Processing ELF
 
 - [How programs get run: ELF binaries](https://lwn.net/Articles/631631/)
 
-## IFUNC
+### IFUNC
 
 - [Gnu support for CPU dispatching](http://www.agner.org/optimize/blog/read.php?i=167)
 - [glibc's use of gnu_indirect_function feature](https://sourceware.org/ml/libc-help/2011-08/msg00006.html)
 - [12.3.2 Runtime Dispatching via IFUNC ELF Extension](https://books.google.com/books?id=X-WcBAAAQBAJ&pg=PA226&lpg=PA226&dq=glibc+indirect+function&source=bl&ots=FmF2LrOuRw&sig=IsQDYJjVVjlGJonCdyC9nyacGJQ&hl=en&sa=X&ved=0ahUKEwjc6smHx-rXAhUU02MKHfOwB4o4ChDoAQhNMAg#v=onepage&q=glibc%20indirect%20function&f=false)
 - [Using GNU indirect functions](https://willnewton.name/uncategorized/using-gnu-indirect-functions/)
 
-## MFV
+### MFV
 
 - [Function multi-versioning in GCC 6](https://lwn.net/Articles/691932/)
 
-## GLIBC Tunables
+### GLIBC Tunables
 
 - [Tunables story continued - glibc 2.26](https://siddhesh.in/posts/tunables-story-continued-glibc-2-26.html)
 
-## GLIBC Categories
+### GLIBC Categories
 
 - [https://siddhesh.in/categories/glibc.html](https://siddhesh.in/categories/glibc.html)
 
-## Books
+### Books
 
 - [Jim Kukunas-2015, Power and Performance](https://www.amazon.com/Power-Performance-Software-Analysis-Optimization-ebook/dp/B00WZ1AX6S)
 
