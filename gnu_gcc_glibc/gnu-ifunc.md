@@ -147,7 +147,7 @@ for implmenting indirect functions, otherwise, use the old behavior,
 #endif /* !HAVE_GCC_IFUNC  */
 ```
 
-## Briefly recap of ELF and x86/x86_64 ABIs
+## ELF and x86/x86_64 ABIs
 
 In Linux, the `execve()` system call is used to laod and execute a stored 
 program in the current process. To accommodate this, the stored program must
