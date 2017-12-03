@@ -24,6 +24,7 @@
 
 # GNU GCC and Glibc
 
+- [GNU Indirect Function and x86 ELF ABIs](gnu_gcc_glibc/gnu-ifunc.md)
 - [Debugging cc1](gnu_gcc_glibc/debugging-cc1.md)
 - [CPUID](gnu_gcc_glibc/cpuid.md)
 
