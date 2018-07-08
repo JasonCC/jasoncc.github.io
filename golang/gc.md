@@ -92,5 +92,6 @@ But if you take one thing away, let it be this: garbage collection is a hard pro
 7. [Generation Scavenging: A Non-disruptlve High Perfornm Storage Reclamation Algorithm](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.122.4295&rep=rep1&type=pdf)
 8. [(ROC)Request Oriented Collector](https://docs.google.com/document/d/1gCsFxXamW8RRvOe5hECz98Ftk-tcRRJcDFANj2VwCB0/edit)
 9. [Go GC:Latency Problem Solved](https://talks.golang.org/2015/go-gc.pdf)
+10. [Andrey Sibiryov, Uber, Golang’s Garbage](https://www.usenix.org/sites/default/files/conference/protected-files/srecon17asia_slides_sibiryov.pdf)
 
 [back](../)
