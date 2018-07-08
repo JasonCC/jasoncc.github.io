@@ -75,7 +75,7 @@ mark/sweep in the background.
 Go optimises for pause times as the expense of throughput to such an extent
 that it seems willing to slow down your program by almost any amount in order
 to get event just slightly faster pauses. (But it's still too expensive to
-a program working as a OS kernel)
+a program working as an OS kernel)
 
 ## Conclusion from Mike Hearn
 
