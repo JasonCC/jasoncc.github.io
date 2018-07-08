@@ -81,6 +81,38 @@ a program working as an OS kernel)
 
 But if you take one thing away, let it be this: garbage collection is a hard problem, really hard, one that has been studied by an army of computer scientists for decades. So be very suspicious of supposed breakthroughs that everyone else missed. They are more likely to just be strange or unusual tradeoffs in disguise, avoided by others for reasons that may only become apparent later.
 
+## Profiling and Tracing
+
+- pprof
+
+There are many ways to get started with profiling, see `go doc runtime/pprof`.
+After getting a `.prof` file, use `pprof -http=:8080 cpu.prof` to play with it.
+Note that it's not go tool's pprof, get it, `go get github.com/google/pprof`.
+
+- Garbage Collector Trace
+
+```
+$ GODEBUG=gctrace=1 ./myserver
+```
+
+- Trace
+
+```
+import (
+  "runtime/trace"
+  "os"
+)
+...
+f, err := os.Create("trace.out")
+defer f.Close()
+err = trace.Start(f)
+defer trace.Stop()
+```
+
+```
+go tool trace <binary> trace.out
+```
+
 ## References
 
 1. [Pusher: GC in theory and practice](https://making.pusher.com/golangs-real-time-gc-in-theory-and-practice/index.html)
@@ -93,5 +125,6 @@ But if you take one thing away, let it be this: garbage collection is a hard pro
 8. [(ROC)Request Oriented Collector](https://docs.google.com/document/d/1gCsFxXamW8RRvOe5hECz98Ftk-tcRRJcDFANj2VwCB0/edit)
 9. [Go GC:Latency Problem Solved](https://talks.golang.org/2015/go-gc.pdf)
 10. [Andrey Sibiryov, Uber, Golang’s Garbage](https://www.usenix.org/sites/default/files/conference/protected-files/srecon17asia_slides_sibiryov.pdf)
+11. [Go’s march to low-latency GC](https://blog.twitch.tv/gos-march-to-low-latency-gc-a6fa96f06eb7)
 
 [back](../)
