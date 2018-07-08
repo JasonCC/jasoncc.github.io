@@ -58,11 +58,44 @@ arch/x86/entry/syscalls/syscall_32.tbl 	// for i386 entries
 
 - [Glibc wrappers for (nearly all) Linux system calls](https://lwn.net/Articles/655028/)
 
+## Tools
+
+- **ausyscall(8)**
+> mapping syscall names and nubmers
+
+```
+$ ausyscall i386 open
+open               5
+mq_open            277
+openat             295
+perf_event_open    336
+open_by_handle_at  342
+
+$ ausyscall x86_64 open
+open               2
+mq_open            240
+openat             257
+perf_event_open    298
+open_by_handle_at  304
+
+$ ausyscall --dump | head -n10
+Using x86_64 syscall table:
+0       read
+1       write
+2       open
+3       close
+4       stat
+5       fstat
+6       lstat
+7       poll
+8       lseek
+```
+
 # References
 
 - [kernel entries in entry_64.S](https://www.kernel.org/doc/Documentation/x86/entry_64.txt)
 - [Adding a New System Call](https://www.kernel.org/doc/html/latest/process/adding-syscalls.html?highlight=syscall)
-
+- [audit-userspace](https://github.com/linux-audit/audit-userspace)
 
 [back](../)
 

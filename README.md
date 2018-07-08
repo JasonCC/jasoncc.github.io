@@ -32,6 +32,10 @@
 
 - [How Many Forks](lpi/how_many_forks.md)
 
+# Golang
+
+- [The Go Gargabe Collector](golang/gc.md)
+
 # C Lang
 
 - [Why Implicit Function Declaration Is Harmful](clang/clang-implicit-function-declaration-is-harmful.md)
