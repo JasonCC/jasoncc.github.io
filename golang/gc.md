@@ -64,7 +64,7 @@ mark/sweep in the background.
 - Pause distribution: runtime has no choice but to stop your program entirely
   and wait for the GC cycle to complete. Thus when Go claims GC pauses are
   very low, this claim can only be true for the case where the GC has
-  sufficient CPU time and headroom to outrun the main program. 
+  sufficient CPU time and headroom to outrun the main program.
   So distribution is a bit unpredictable.
 
 - Heap overhead: because collecting the heap via mark/sweep is very slow,
@@ -80,6 +80,11 @@ a program working as an OS kernel)
 ## Conclusion from Mike Hearn
 
 But if you take one thing away, let it be this: garbage collection is a hard problem, really hard, one that has been studied by an army of computer scientists for decades. So be very suspicious of supposed breakthroughs that everyone else missed. They are more likely to just be strange or unusual tradeoffs in disguise, avoided by others for reasons that may only become apparent later.
+
+## GC Knobs
+
+- `SetGCPercent`
+- `SetMaxHeap`
 
 ## Profiling and Tracing
 
@@ -126,5 +131,6 @@ go tool trace <binary> trace.out
 9. [Go GC:Latency Problem Solved](https://talks.golang.org/2015/go-gc.pdf)
 10. [Andrey Sibiryov, Uber, Golang’s Garbage](https://www.usenix.org/sites/default/files/conference/protected-files/srecon17asia_slides_sibiryov.pdf)
 11. [Go’s march to low-latency GC](https://blog.twitch.tv/gos-march-to-low-latency-gc-a6fa96f06eb7)
+12. [Getting to Go](https://blog.golang.org/ismmkeynote)
 
 [back](../)
