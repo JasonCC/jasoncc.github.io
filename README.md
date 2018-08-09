@@ -21,6 +21,7 @@
 # OS Dev
 
 - [ELF](osdev/elf.md)
+- [I-cache coherency and pipeline flushing on modern x86/x64 CPUs](osdev/pipeline-flush.md)
 
 # GNU GCC and Glibc
 
