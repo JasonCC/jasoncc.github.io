@@ -712,6 +712,9 @@ DECLARE_PER_CPU_SHARED_ALIGNED(struct tlb_state, cpu_tlbstate);
 - [Memory part 2: CPU caches](https://lwn.net/Articles/252125/)
 - [Memory part 3: Virtual Memory](https://lwn.net/Articles/253361/)
 
+- [Recursive Mapping](https://os.phil-opp.com/page-tables/)
+> Paging, Page tables
+
 [back](../)
 
 
