@@ -2,8 +2,10 @@
 
 ## Acronyms
 
-SMC     Self Modifying Code
-SMC     Shared Map Cache
+| Acronym | Meaning             |
+| ------- | ------------------- |
+| SMC     | Self Modifying Code |
+| SMC     | Shared Map Cache    |
 
 ## Intel SDM
 
