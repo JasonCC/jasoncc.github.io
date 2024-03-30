@@ -39,7 +39,7 @@ static void *resolve_foo(void)
 {
         if (cpu_has_avx2())
                 return foo_avx2;
-        else if (cpu_has_sse42());
+        else if (cpu_has_sse42())
                 return foo_sse42;
         else
                 return foo_c;
