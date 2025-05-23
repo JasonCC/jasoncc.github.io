@@ -63,7 +63,7 @@ This feature can be useful for anybody who wants to make a highly optimized
 function library for Linux. (It's not possible in Windows)
 
 The downside to this method is that it is an extension to the ELF standard and
-therefor will not be portable to other toolchains or systems. Also, support for
+therefore will not be portable to other toolchains or systems. Also, support for
 older Linux distributions can be problematic since support has only been
 available for five years and has not made it into some order enterprise
 distributions.
@@ -152,14 +152,14 @@ for implmenting indirect functions, otherwise, use the old behavior,
 
 ## ELF and x86/x86_64 ABIs
 
-In Linux, the `execve()` system call is used to laod and execute a stored
+In Linux, the `execve()` system call is used to load and execute a stored
 program in the current process. To accommodate this, the stored program must
 convey information to the kernel regarding how the associated code should be
 organized in memory, among other bits of information. This information is
 communicated through the various pieces of the executable file format, which
 the kernel must thus parse and handle accordingly.
 
-Linux supports parsing executing mulitple file formats. Internally, Linux
+Linux supports parsing executing multiple file formats. Internally, Linux
 abstracts the implementations for each of these file format handlers via the
 `linux_binfmt` descriptor. Each handler is responsible for parsing the
 associated file format, creating the necessary state, and then starting the
@@ -175,7 +175,7 @@ be found in `${KSRC}/fs/binfmt_*.c` and `${KSRC}/fs/exec.c`
 
 While Linux supports multiple executable file formats, the most commonly used
 format on Linux is the Executable and Linkable Format (ELF). The ELF standard
-was published by the UNIX System Laboratories, and was intended to provid a
+was published by the UNIX System Laboratories, and was intended to provide a
 single executable format that would "extend across multiple operating
 environments" (UNIX System Laboratories, 2001).
 
@@ -190,10 +190,10 @@ referenced via shared libraries.
 The ELF format is comprised of two complementary views.
 
 **The first view, linking view**, is comprised of the program sections.
-Sections group various aspects such as code and data into congiuous regions
+Sections group various aspects such as code and data into contiguous regions
 within the the ELF file. The linker is responsible for concatenating duplicate
 sections when linking multiple object files. For example, if object file
-`foo.o` defines a funcion `foo()` and a variable `x`, and object file `bar.o`
+`foo.o` defines a function `foo()` and a variable `x`, and object file `bar.o`
 defines a function `bar()` and a variable `y`, the linker would produce an
 object file whose code section contained functions `foo()` and `bar()` and
 whose data section contained variables `x` and `y`.
@@ -203,7 +203,7 @@ tasks, such as holding code or read-only data. These special sections can be
 identified by leading dot in their name. Developers are also free to define
 their own custom sections.
 
-A sampling of some common special sections and their usage is describled below.
+A sampling of some common special sections and their usage is described below.
 
 - `.text` Holds executable instructions.
 
@@ -242,7 +242,7 @@ address and file offset must be congruent modulo the page size.
 
 One important aspect of building and loading an executable object is the
 handling of external symbols, i.e., symbols exposed in other ELF objects.
-There are two differnt techniques for dealing with external symbols. The first
+There are two different techniques for dealing with external symbols. The first
 technique, static linking, occurs completely at link time while the seconds
 technique, dynamic linking, occurs partially at link time and partially at load
 time.
@@ -292,11 +292,11 @@ control is transferred to the executable.
 
 The linker creates an `PT_INTERP` entry into the object's Program Header. This
 entry contains a NULL-terminated filesystem path to the dynamic linker,
-normally `ld.so` or `ld-linux.so`. This is the dyanmic linker that will be
+normally `ld.so` or `ld-linux.so`. This is the dynamic linker that will be
 invoked to load the necessary symbols.
 
 The linker also creates a `.dynamic` section that includes a
-sentinel-entry-terminated arrary of dynamic properties. Each of these entries
+sentinel-entry-terminated array of dynamic properties. Each of these entries
 is composed of a type and value. A full list of supported types and their
 subsequent meanings can be found within the ELF specification. A few of the
 important types are described below.
@@ -335,7 +335,7 @@ possible for conflicts to arise where two objects expect to be loaded at the
 same address.
 
 In order to handle this, the symbols in shared objects must be *relocatable*.
-The ELF format supports many differnt types of relocations; a full description
+The ELF format supports many different types of relocations; a full description
 of each kind can be found within ELF specification. While the programmer isn't
 required to manually handle these relocations, it's necessary to understand
 what happens behind the scenes, because it impacts both performance and
@@ -343,7 +343,7 @@ security.
 
 When building relocatable code, the linker uses a dummy base address,
 typically zero, with each symbol value set to the appropriate offset from the
-base address of the symbol's section. Each time one of these addrsses is used
+base address of the symbol's section. Each time one of these addresses is used
 in the code, the linker creates an entry in that section's corresponding
 relocation section. This entry contains the relocation type, that determines
 how the real address should be calculated, and the location of the code that
@@ -368,7 +368,7 @@ order to alleviate this issue, ELF supports **lazy binding**, that is, where
 symbols are resolved the first time they are actually used. To accommodate
 this, function calls occur indirectly through the **Procedure Linkage Table** (
 **PLT**) and **Gobal Offset Table** (**GOT**). The GOT contains the calculated
-addresses of the relocated symbols, whilie PLT is used as a *trampoline* to
+addresses of the relocated symbols, while PLT is used as a *trampoline* to
 that address for function function calls.
 
 Each entry in the PLT, except the first, corresponds to a special function.
@@ -380,7 +380,7 @@ first jump instruction. This next instruction pushes the symbol's relocation
 offset onto the stack. Then the next instruction jumps to the first PLT entry,
 which invokes the dynamic linker to resolve the relocation offset pushed onto
 the stack. Once the dynamic linker has calculated the relocated address, it
-updates the relevant entry in the GOT and them jumps to the relocated function.
+updates the relevant entry in the GOT and then jumps to the relocated function.
 
 For future invocations of that function, the code will still jump to the
 function's PLT entry. The first instruction in the PLT will jump to the address
@@ -413,7 +413,7 @@ which is only available in 64-bit mode. For 32-bit PIC, ELF ABI reserves the
 Since the instruction pointer isn't directly accessible in 32-bit mode, a
 special trick must be employed. The `CALL` instruction pushes the address of
 the next instruction, the first instruction after the function returns, onto
-the stack so that `RET` instruction can resume execution ther after the
+the stack so that `RET` instruction can resume execution there after the
 function call is complete. Leveraging this, a simple function can read that
 saved address from the stack, and then return. In the GNU libc implementation,
 this type of function is typically called `__i686.get_pc_thunk.bx`, which loads
